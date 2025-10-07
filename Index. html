@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalAI India – Professional Legal Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #0f3460;
+            --gold-color: #ffd700;
+            --text-light: #e94560;
+            --gradient-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient-bg);
+            color: white;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--gold-color);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--gold-color) !important;
+        }
+        .nav-link {
+            color: white !important;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: var(--gold-color) !important;
+        }
+        .hero-section {
+            padding: 100px 0 60px 0;
+            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23001f3f" width="1200" height="600"/><circle fill="%23003366" cx="200" cy="150" r="100" opacity="0.3"/><circle fill="%23004080" cx="800" cy="350" r="150" opacity="0.2"/><circle fill="%230066cc" cx="1000" cy="100" r="80" opacity="0.4"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .chat-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease;
+        }
+        .user-message {
+            background: linear-gradient(135deg, var(--text-light), #ff6b8a);
+            margin-left: auto;
+            text-align: right;
+        }
+        .ai-message {
+            background: linear-gradient(135deg, var(--accent-color), #4a90e2);
+            margin-right: auto;
+        }
+        .input-group {
+            position: relative;
+        }
+        .form-control {
+            background: rgba(255,255,255,0.13);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white !important;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 1rem;
+        }
+        .form-control:focus {
+            background: rgba(255,255,255,0.18);
+            border-color: var(--gold-color);
+            color: white !important;
+            box-shadow: 0 0 20px rgba(255,215,0,0.3);
+        }
+        .form-control::placeholder {
+            color: #cccccc !important;
+        }
+        
+        select.form-control {
+            color: white !important;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 50px;
+        }
+        select.form-control option {
+            background-color: #2c3e50 !important;
+            color: white !important;
+            padding: 10px !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--text-light), #ff6b8a);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(233,69,96,0.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, var(--gold-color), #ffed4a);
+            border: none;
+            color: #1a1a2e;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,215,0,0.4);
+        }
+        .features-section {
+            padding: 80px 0;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--gold-color);
+            margin-bottom: 20px;
+        }
+        .letter-form {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--gold-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        .progress-container {
+            display: none;
+            margin: 30px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        .step-circle.active {
+            background: var(--gold-color);
+            color: #1a1a2e;
+            animation: pulse 2s infinite;
+        }
+        .step-circle.completed {
+            background: #28a745;
+            color: white;
+        }
+        .step-text {
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .step-line {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: calc(100% - 40px);
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            z-index: -1;
+        }
+        .step-line.completed {
+            background: var(--gold-color);
+        }
+        .progress-bar-custom {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-color), #ffed4a);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        .status-message {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--gold-color);
+            margin-top: 10px;
+            min-height: 24px;
+        }
+
+        .data-collection-chat {
+            display: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .collection-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .collection-input {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Success notification instead of popup */
+        .success-notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 9999;
+            animation: slideInRight 0.5s ease;
+            max-width: 400px;
+        }
+        .success-notification .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .footer {
+            background: var(--primary-color);
+            padding: 50px 0;
+            text-align: center;
+            border-top: 2px solid var(--gold-color);
+            margin-top: 80px;
+        }
+        .legal-areas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 30px 0;
+            justify-content: center;
+        }
+        .legal-tag {
+            background: linear-gradient(135deg, var(--accent-color), #4a90e2);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .legal-tag:hover {
+            background: linear-gradient(135deg, var(--text-light), #ff6b8a);
+            transform: scale(1.05);
+        }
+        .professional-note {
+            font-size: 0.9rem;
+            color: #cccccc;
+            font-style: italic;
+            margin-top: 8px;
+        }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.2rem; }
+            .chat-container { margin: 15px; padding: 20px; }
+            .letter-form { padding: 25px; }
+            .message { max-width: 90%; }
+            .progress-steps { flex-direction: column; gap: 15px; }
+            .step-line { display: none; }
+            .success-notification { 
+                top: 10px; 
+                right: 10px; 
+                left: 10px; 
+                max-width: none; 
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Success Notification (replaces popup) -->
+<div id="successNotification" class="success-notification">
+    <button class="close-btn" onclick="closeNotification()">&times;</button>
+    <div id="notificationContent"></div>
+</div>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#"><i class="fas fa-balance-scale"></i> LegalAI India</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#chat">Legal Chat</a></li>
+                <li class="nav-item"><a class="nav-link" href="#letter">Letter Generator</a></li>
+                <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section id="home" class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">Professional Legal Assistant</h1>
+        <p class="hero-subtitle">Expert Indian law guidance and professional legal document generation</p>
+        <div class="legal-areas">
+            <span class="legal-tag">Land Disputes</span>
+            <span class="legal-tag">Vehicle Cases</span>
+            <span class="legal-tag">Property Law</span>
+            <span class="legal-tag">Criminal Law</span>
+            <span class="legal-tag">Family Law</span>
+            <span class="legal-tag">Consumer Rights</span>
+            <span class="legal-tag">Labor Law</span>
+            <span class="legal-tag">Business Law</span>
+        </div>
+        <a href="#chat" class="btn btn-primary btn-lg">Start Legal Consultation</a>
+    </div>
+</section>
+
+<section id="chat" class="container">
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2><i class="fas fa-robot"></i> Legal AI Assistant</h2>
+            <p>Professional Indian law guidance and expert consultation</p>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+            <div class="message ai-message">
+                <strong>LegalAI:</strong> Welcome! I'm your professional AI legal assistant specializing in Indian law. I can help you with comprehensive legal guidance, document preparation, and procedural advice. How may I assist you today?
+            </div>
+        </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <span>Processing your query...</span>
+        </div>
+        <div class="input-group">
+            <input type="text" id="userInput" class="form-control" placeholder="Describe your legal matter...">
+            <button class="btn btn-primary" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </div>
+    </div>
+</section>
+
+<section id="letter" class="container">
+    <div class="letter-form">
+        <h2 class="text-center mb-4"><i class="fas fa-file-alt"></i> Professional Legal Document Generator</h2>
+        <p class="text-center mb-4">Generate professionally formatted legal letters with accurate Indian law references</p>
+        
+        <div id="progressContainer" class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-step">
+                    <div class="step-circle" id="step1">1</div>
+                    <div class="step-text">Case Analysis</div>
+                    <div class="step-line"></div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-circle" id="step2">2</div>
+                    <div class="step-text">Information Gathering</div>
+                    <div class="step-line"></div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-circle" id="step3">3</div>
+                    <div class="step-text">Document Creation</div>
+                    <div class="step-line"></div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-circle" id="step4">4</div>
+                    <div class="step-text">PDF Generation</div>
+                </div>
+            </div>
+            <div class="progress-bar-custom">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+
+        <div id="dataCollectionChat" class="data-collection-chat">
+            <h5><i class="fas fa-comments"></i> Professional Case Information Collection</h5>
+            <div id="collectionMessages" class="collection-messages"></div>
+            <div class="collection-input">
+                <input type="text" id="collectionInput" class="form-control" placeholder="Provide your response here...">
+                <button class="btn btn-primary" onclick="handleCollectionResponse()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Client Name</label>
+                    <input type="text" id="userName" class="form-control" placeholder="Enter full legal name">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Document Date</label>
+                    <input type="date" id="letterDate" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Recipient Name/Organization</label>
+                    <input type="text" id="recipientName" class="form-control" placeholder="Addressee details">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Document Type (Optional)</label>
+                    <select id="letterType" class="form-control">
+                        <option value="">Auto-detect appropriate type</option>
+                        <option value="legal_notice">Legal Notice</option>
+                        <option value="complaint">Complaint Letter</option>
+                        <option value="demand">Demand Letter</option>
+                        <option value="cease_desist">Cease and Desist</option>
+                        <option value="property_dispute">Property Dispute</option>
+                        <option value="consumer_complaint">Consumer Complaint</option>
+                    </select>
+                    <div class="professional-note">AI will determine the most suitable document type</div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Legal Issue Description</label>
+            <textarea id="issueDescription" class="form-control" rows="4" placeholder="Provide comprehensive details of your legal matter..."></textarea>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-warning btn-lg" onclick="generateLetter()" id="generateBtn">
+                <i class="fas fa-file-pdf"></i> Generate Professional Legal Document
+            </button>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="features-section">
+    <div class="container">
+        <h2 class="text-center mb-5">Professional Legal Services</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h4>Verified Accuracy</h4>
+                    <p>Comprehensive Indian law database with verified sections, proper formatting, and professional legal structure.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4>Professional Quality</h4>
+                    <p>Documents meet professional legal standards with proper citations, formatting, and comprehensive legal backing.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4>24/7 Availability</h4>
+                    <p>Professional legal document generation and consultation available round the clock for urgent matters.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 LegalAI India. Professional Legal Technology Solutions.</p>
+        <p><strong>Professional Disclaimer:</strong> This platform provides legal information and document generation services. For specific legal advice and representation, consult a qualified practicing advocate.</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+const AI_ENDPOINT = 'https://izyoujklu73jzi4qfonvb6tf.agents.do-ai.run/api/v1/chat/completions';
+const AI_API_KEY = 'BqgCoSBu0FH3FH45YQCYhbtQ1N0szzqA';
+
+let collectedData = {};
+let currentQuestion = 0;
+let isCollectingData = false;
+let conversationHistory = [];
+
+const fallbackQuestions = {
+    scam: ["What was the exact amount involved (₹)?", "When did this incident occur?", "What evidence do you have?"],
+    consumer: ["What was the purchase amount (₹)?", "What specific service was deficient?", "What supporting documents do you have?"],
+    property: ["What is the property value (₹)?", "What legal documents do you possess?", "When did the dispute arise?"],
+    vehicle: ["What is the damage amount (₹)?", "When did the incident happen?", "Do you have insurance papers?"],
+    employment: ["What was your monthly salary (₹)?", "What was your employment duration?", "What exactly transpired?"],
+    default: ["What is the monetary amount involved (₹)?", "When did this issue begin?", "What resolution do you seek?"]
+};
+
+document.getElementById('letterDate').value = new Date().toISOString().split('T')[0];
+
+document.getElementById('userInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendMessage();
+});
+
+document.getElementById('collectionInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') handleCollectionResponse();
+});
+
+// Success notification functions (replaces popup alerts)
+function showSuccessNotification(title, message, fileName) {
+    const notification = document.getElementById('successNotification');
+    const content = document.getElementById('notificationContent');
+    
+    content.innerHTML = `
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <i class="fas fa-check-circle" style="font-size: 24px; margin-right: 10px;"></i>
+            <strong style="font-size: 16px;">${title}</strong>
+        </div>
+        <div style="margin-bottom: 8px;">${message}</div>
+        <div style="font-size: 14px; opacity: 0.9;">File: ${fileName}</div>
+        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Document downloaded successfully</div>
+    `;
+    
+    notification.style.display = 'block';
+    
+    // Auto-close after 5 seconds
+    setTimeout(() => {
+        closeNotification();
+    }, 5000);
+}
+
+function closeNotification() {
+    const notification = document.getElementById('successNotification');
+    notification.style.display = 'none';
+}
+
+function updateProgress(step, message, percentage) {
+    const progressFill = document.getElementById('progressFill');
+    const statusMessage = document.getElementById('statusMessage');
+    
+    progressFill.style.width = percentage + '%';
+    statusMessage.textContent = message;
+    
+    for (let i = 1; i <= 4; i++) {
+        const stepCircle = document.getElementById(`step${i}`);
+        stepCircle.classList.remove('active', 'completed');
+        
+        if (i < step) {
+            stepCircle.classList.add('completed');
+            stepCircle.innerHTML = '<i class="fas fa-check"></i>';
+        } else if (i === step) {
+            stepCircle.classList.add('active');
+            stepCircle.textContent = i;
+        } else {
+            stepCircle.textContent = i;
+        }
+    }
+    
+    document.querySelectorAll('.step-line').forEach((line, index) => {
+        if (index < step - 1) {
+            line.classList.add('completed');
+        } else {
+            line.classList.remove('completed');
+        }
+    });
+}
+
+function showProgress() {
+    document.getElementById('progressContainer').style.display = 'block';
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('generateBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+}
+
+function hideProgress() {
+    document.getElementById('progressContainer').style.display = 'none';
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('generateBtn').innerHTML = '<i class="fas fa-file-pdf"></i> Generate Professional Legal Document';
+}
+
+function addCollectionMessage(sender, message, isAI = false) {
+    const messagesDiv = document.getElementById('collectionMessages');
+    if (!messagesDiv) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isAI ? 'ai-message' : 'user-message'}`;
+    messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+    conversationHistory.push({
+        sender: sender,
+        message: message,
+        timestamp: new Date().toISOString()
+    });
+}
+
+function getIssueType(description) {
+    const desc = description.toLowerCase();
+    if (desc.includes('scam') || desc.includes('fraud') || desc.includes('cheat')) return 'scam';
+    if (desc.includes('product') || desc.includes('service') || desc.includes('shop') || desc.includes('company')) return 'consumer';
+    if (desc.includes('property') || desc.includes('land') || desc.includes('house') || desc.includes('flat')) return 'property';
+    if (desc.includes('vehicle') || desc.includes('car') || desc.includes('bike') || desc.includes('accident')) return 'vehicle';
+    if (desc.includes('job') || desc.includes('employment') || desc.includes('salary') || desc.includes('office')) return 'employment';
+    return 'default';
+}
+
+function getFallbackQuestion(issueType, questionIndex) {
+    const questions = fallbackQuestions[issueType] || fallbackQuestions.default;
+    return questions[questionIndex] || "Please provide additional details about your legal matter.";
+}
+
+async function generateDynamicQuestion(issueDescription, previousAnswers) {
+    try {
+        const context = conversationHistory.map(h => `${h.sender}: ${h.message}`).join('\n');
+        
+        const response = await fetch(AI_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are a professional legal assistant. Ask ONE specific question to gather crucial information for legal documentation. Focus on:
+- Exact monetary amounts using ₹ symbol
+- Specific dates and timelines
+- Supporting documents and evidence
+- Clear factual details
+- Professional tone`
+                    },
+                    {
+                        role: 'user',
+                        content: `Legal matter: "${issueDescription}"\n\nConversation: ${context}\n\nAsk ONE professional question for comprehensive legal documentation.`
+                    }
+                ],
+                max_tokens: 100,
+                temperature: 0.3,
+                timeout: 10000
+            })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content.trim();
+        } else {
+            throw new Error('Invalid response format');
+        }
+        
+    } catch (error) {
+        console.error('AI question generation failed:', error);
+        const issueType = getIssueType(issueDescription);
+        return getFallbackQuestion(issueType, currentQuestion);
+    }
+}
+
+async function startDynamicDataCollection(issueDescription, letterType) {
+    try {
+        isCollectingData = true;
+        currentQuestion = 0;
+        conversationHistory = [];
+        
+        const chatDiv = document.getElementById('dataCollectionChat');
+        if (!chatDiv) return;
+        
+        chatDiv.style.display = 'block';
+        document.getElementById('collectionMessages').innerHTML = '';
+        collectedData = { issueDescription, letterType };
+        
+        addCollectionMessage('LegalAI', 'I will gather specific information to create a comprehensive professional legal document for your case.', true);
+        
+        await delay(1000);
+        
+        let firstQuestion;
+        try {
+            firstQuestion = await generateDynamicQuestion(issueDescription, []);
+        } catch (error) {
+            const issueType = getIssueType(issueDescription);
+            firstQuestion = getFallbackQuestion(issueType, 0);
+        }
+        
+        if (firstQuestion && firstQuestion.trim()) {
+            addCollectionMessage('LegalAI', firstQuestion, true);
+        } else {
+            addCollectionMessage('LegalAI', 'What is the exact monetary amount involved in this legal matter (₹)?', true);
+        }
+        
+    } catch (error) {
+        console.error('Error starting data collection:', error);
+        addCollectionMessage('LegalAI', 'Let me gather the necessary information for your legal document.', true);
+        await delay(500);
+        addCollectionMessage('LegalAI', 'Please describe the main legal issue you are facing.', true);
+    }
+}
+
+async function handleCollectionResponse() {
+    try {
+        const input = document.getElementById('collectionInput');
+        if (!input) return;
+        
+        const response = input.value.trim();
+        if (!response) return;
+        
+        addCollectionMessage('You', response);
+        input.value = '';
+        
+        collectedData[`response_${currentQuestion}`] = response;
+        currentQuestion++;
+        
+        if (currentQuestion < 3) {
+            await delay(800);
+            
+            let nextQuestion;
+            try {
+                nextQuestion = await generateDynamicQuestion(
+                    collectedData.issueDescription, 
+                    Object.values(collectedData).slice(2)
+                );
+            } catch (error) {
+                const issueType = getIssueType(collectedData.issueDescription);
+                nextQuestion = getFallbackQuestion(issueType, currentQuestion);
+            }
+            
+            if (nextQuestion && nextQuestion.trim()) {
+                addCollectionMessage('LegalAI', nextQuestion, true);
+            } else {
+                addCollectionMessage('LegalAI', 'What specific resolution or outcome do you seek from this legal document?', true);
+            }
+            
+        } else {
+            setTimeout(() => {
+                addCollectionMessage('LegalAI', 'Thank you. I will now prepare a comprehensive professional legal document with accurate Indian law references and proper formatting.', true);
+                setTimeout(() => {
+                    document.getElementById('dataCollectionChat').style.display = 'none';
+                    isCollectingData = false;
+                    proceedWithProfessionalGeneration();
+                }, 2000);
+            }, 1000);
+        }
+        
+    } catch (error) {
+        console.error('Error handling collection response:', error);
+        addCollectionMessage('LegalAI', 'Thank you for your response. Please provide any additional relevant details.', true);
+    }
+}
+
+async function sendMessage() {
+    const userInput = document.getElementById('userInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const loading = document.getElementById('loading');
+    const message = userInput.value.trim();
+    if (!message) return;
+    
+    const userMessageDiv = document.createElement('div');
+    userMessageDiv.className = 'message user-message';
+    userMessageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+    chatMessages.appendChild(userMessageDiv);
+    userInput.value = '';
+    loading.style.display = 'block';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    try {
+        const response = await fetch(AI_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are LegalAI India, a professional Indian legal assistant. Provide accurate, comprehensive legal guidance with proper section references. Maintain professional tone and emphasize consulting qualified advocates for representation.'
+                    },
+                    {
+                        role: 'user',
+                        content: message
+                    }
+                ],
+                max_tokens: 1500,
+                temperature: 0.7
+            })
+        });
+        const data = await response.json();
+        const aiResponse = data.choices[0].message.content;
+        const aiMessageDiv = document.createElement('div');
+        aiMessageDiv.className = 'message ai-message';
+        aiMessageDiv.innerHTML = `<strong>LegalAI:</strong> ${aiResponse}`;
+        chatMessages.appendChild(aiMessageDiv);
+    } catch (error) {
+        const errorMessageDiv = document.createElement('div');
+        errorMessageDiv.className = 'message ai-message';
+        errorMessageDiv.innerHTML = `<strong>LegalAI:</strong> I apologize for the technical difficulty. Please try again or rephrase your query.`;
+        chatMessages.appendChild(errorMessageDiv);
+    }
+    loading.style.display = 'none';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function generateLetter() {
+    const userName = document.getElementById('userName').value;
+    const letterDate = document.getElementById('letterDate').value;
+    const recipientName = document.getElementById('recipientName').value;
+    let letterType = document.getElementById('letterType').value;
+    const issueDescription = document.getElementById('issueDescription').value;
+
+    if (!userName || !letterDate || !recipientName || !issueDescription) {
+        // Replace popup alert with notification
+        showSuccessNotification('Incomplete Information', 'Please complete all required fields to generate the legal document.', 'Form validation required');
+        return;
+    }
+
+    showProgress();
+    updateProgress(1, 'Analyzing legal matter for comprehensive documentation...', 25);
+    
+    await delay(1000);
+    
+    if (!letterType) {
+        try {
+            updateProgress(1, 'Determining appropriate legal document type...', 35);
+            
+            const typeResponse = await fetch(AI_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AI_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Analyze the legal matter and classify the document type. Respond with only: legal_notice, complaint, demand, cease_desist, property_dispute, or consumer_complaint.'
+                        },
+                        {
+                            role: 'user',
+                            content: `Legal matter: "${issueDescription}"`
+                        }
+                    ],
+                    max_tokens: 20,
+                    temperature: 0.1
+                })
+            });
+            const typeData = await typeResponse.json();
+            letterType = typeData.choices[0].message.content.trim().toLowerCase();
+            
+            const validTypes = ['legal_notice', 'complaint', 'demand', 'cease_desist', 'property_dispute', 'consumer_complaint'];
+            if (!validTypes.includes(letterType)) {
+                letterType = 'legal_notice';
+            }
+        } catch (error) {
+            letterType = 'legal_notice';
+        }
+    }
+    
+    updateProgress(2, 'Initiating professional information collection...', 45);
+    await delay(500);
+    
+    await startDynamicDataCollection(issueDescription, letterType);
+}
+
+async function proceedWithProfessionalGeneration() {
+    const userName = document.getElementById('userName').value;
+    const letterDate = document.getElementById('letterDate').value;
+    const recipientName = document.getElementById('recipientName').value;
+    
+    updateProgress(3, 'Creating professional legal document with comprehensive Indian law references...', 75);
+    await delay(500);
+    
+    try {
+        const conversationSummary = conversationHistory
+            .filter(h => h.sender === 'You')
+            .map(h => h.message)
+            .join('. ');
+            
+        const comprehensiveCase = `
+        Primary Legal Matter: ${collectedData.issueDescription}
+        Detailed Information: ${conversationSummary}
+        Supporting Details: ${Object.values(collectedData).slice(2).join('. ')}
+        `;
+        
+        const response = await fetch(AI_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are a professional Indian legal document writer. Create comprehensive legal letters following Indian legal standards.
+
+MANDATORY REQUIREMENTS:
+1. SINGLE header format: Date (right-aligned), From, To, SUBJECT (ONCE only at top)
+2. CORRECT currency symbol: ₹ (NOT ¹) for all amounts
+3. COMPREHENSIVE legal sections:
+   - Consumer Protection Act 2019: Section 2(7) Consumer, Section 2(21) Goods, Section 2(42) Service, Section 2(11) Deficiency, Section 2(47) Unfair trade practice
+   - Section 34 for District Commission jurisdiction
+4. 15 days deadline (NOT range)
+5. Professional demands: enforcement of terms OR specific refund amounts
+6. Supporting documents: "Purchase receipt, service agreement, communication records"
+7. Proper disclaimer: "This notice is sent without prejudice to my rights and remedies under law"
+8. Professional closure: "Yours faithfully" with signature line
+9. Clear factual timeline with specific dates
+10. NO duplicate information anywhere
+
+PROFESSIONAL INDIAN LEGAL STRUCTURE:
+Date: [Date] (right-aligned)
+From: [Complete details]
+To: [Complete details]
+SUBJECT: [Professional subject line]
+
+Sir/Madam,
+
+[Professional legal content with comprehensive backing]
+
+This notice is sent without prejudice to my rights and remedies under law.
+
+Yours faithfully,
+[Name]`
+                    },
+                    {
+                        role: 'user',
+                        content: `Create comprehensive professional ${collectedData.letterType.replace("_"," ")} letter:
+                        
+Client: ${userName}
+Date: ${letterDate}
+Recipient: ${recipientName}
+
+Comprehensive Case Details: ${comprehensiveCase}
+
+REQUIREMENTS:
+- Professional Indian legal format
+- Comprehensive Consumer Protection Act 2019 sections
+- Correct ₹ currency symbol
+- 15 days compliance deadline
+- Complete supporting documents list
+- Professional disclaimer
+- Proper legal backing and demands
+- Use ALL case-specific information provided`
+                    }
+                ],
+                max_tokens: 2500,
+                temperature: 0.1
+            })
+        });
+
+        updateProgress(3, 'Professional legal document created with comprehensive legal backing', 90);
+        await delay(500);
+
+        const data = await response.json();
+        let letterContent = data.choices[0].message.content;
+        
+        // Comprehensive post-processing for professional standards
+        letterContent = letterContent
+            .replace(/Date:.*?\n.*?Date:/g, 'Date:')
+            .replace(/From:.*?\n.*?From:/g, 'From:')  
+            .replace(/To:.*?\n.*?To:/g, 'To:')
+            .replace(/District Consumer Disputes Redressal Forum/g, 'District Consumer Disputes Redressal Commission')
+            .replace(/¹/g, '₹')
+            .replace(/Rs\.?/g, '₹')
+            .replace(/within 15-30 days/g, 'within 15 days')
+            .replace(/15 to 30 days/g, '15 days')
+            .replace(/fifteen to thirty days/g, 'fifteen days')
+            .replace(/\n\s*\n\s*\n/g, '\n\n')
+            .trim();
+
+        updateProgress(4, 'Generating professional PDF document...', 95);
+        await delay(500);
+
+        // Create professionally formatted PDF with PERFECT ALIGNMENT
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm', 
+            format: 'a4'
+        });
+        
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const leftMargin = 25;
+        const rightMargin = 25;
+        const topMargin = 25;
+        const contentWidth = pageWidth - leftMargin - rightMargin;
+        
+        let yPos = topMargin + 10;
+
+        // PROFESSIONAL HEADER - PERFECTLY CENTERED
+        doc.setFontSize(18);
+        doc.setFont('times', 'bold');
+        const headerTitle = collectedData.letterType.replace('_', ' ').toUpperCase();
+        const headerWidth = doc.getTextWidth(headerTitle);
+        doc.text(headerTitle, (pageWidth - headerWidth) / 2, yPos);
+        yPos += 8;
+        
+        // PERFECT UNDERLINE - CENTERED UNDER HEADER
+        doc.setLineWidth(1);
+        const lineStart = (pageWidth - headerWidth) / 2;
+        const lineEnd = lineStart + headerWidth;
+        doc.line(lineStart, yPos, lineEnd, yPos);
+        yPos += 25;
+        
+        // DATE - PERFECT RIGHT ALIGNMENT
+        doc.setFontSize(12);
+        doc.setFont('times', 'normal');
+        const dateText = `Date: ${letterDate}`;
+        const dateWidth = doc.getTextWidth(dateText);
+        doc.text(dateText, pageWidth - rightMargin - dateWidth, yPos);
+        yPos += 20;
+        
+        // FROM SECTION - PERFECT LEFT ALIGNMENT
+        doc.setFont('times', 'bold');
+        doc.text('From:', leftMargin, yPos);
+        yPos += 8;
+        doc.setFont('times', 'normal');
+        doc.text(userName, leftMargin + 20, yPos);
+        yPos += 18;
+        
+        // TO SECTION - PERFECT LEFT ALIGNMENT
+        doc.setFont('times', 'bold');
+        doc.text('To:', leftMargin, yPos);
+        yPos += 8;
+        doc.setFont('times', 'normal');
+        doc.text(recipientName, leftMargin + 20, yPos);
+        yPos += 25;
+        
+        // SUBJECT LINE - PROPER FORMATTING
+        doc.setFont('times', 'bold');
+        doc.text('SUBJECT:', leftMargin, yPos);
+        yPos += 8;
+        doc.setFont('times', 'normal');
+        const subjectText = `${collectedData.letterType.replace('_', ' ').charAt(0).toUpperCase() + collectedData.letterType.replace('_', ' ').slice(1)} regarding ${collectedData.issueDescription.substring(0, 60)}...`;
+        const subjectLines = doc.splitTextToSize(subjectText, contentWidth - 20);
+        doc.text(subjectLines, leftMargin + 20, yPos);
+        yPos += subjectLines.length * 6 + 15;
+        
+        // SALUTATION
+        doc.text('Sir/Madam,', leftMargin, yPos);
+        yPos += 15;
+        
+        // MAIN CONTENT WITH PERFECT ALIGNMENT
+        doc.setFontSize(11);
+        doc.setFont('times', 'normal');
+        
+        // Clean content and remove header duplicates
+        const cleanContent = letterContent
+            .replace(/^Date:.*$/gm, '')
+            .replace(/^From:.*$/gm, '')
+            .replace(/^To:.*$/gm, '')
+            .replace(/^SUBJECT:.*$/gm, '')
+            .replace(/^Sir\/Madam,.*$/gm, '')
+            .replace(/\n\s*\n/g, '\n')
+            .trim();
+        
+        const contentLines = doc.splitTextToSize(cleanContent, contentWidth);
+        
+        for (let i = 0; i < contentLines.length; i++) {
+            if (yPos > pageHeight - 60) {
+                doc.addPage();
+                yPos = topMargin;
+            }
+            doc.text(contentLines[i], leftMargin, yPos);
+            yPos += 6;
+        }
+        
+        // ENSURE SPACE FOR SIGNATURE
+        if (yPos > pageHeight - 80) {
+            doc.addPage();
+            yPos = topMargin;
+        }
+        
+        yPos += 20;
+        
+        // PROFESSIONAL CLOSING - PERFECT ALIGNMENT
+        doc.setFont('times', 'normal');
+        doc.text('Yours faithfully,', leftMargin, yPos);
+        yPos += 25;
+        
+        // SIGNATURE LINE - PERFECT ALIGNMENT
+        doc.setFont('times', 'bold');
+        doc.text(userName, leftMargin, yPos);
+        yPos += 5;
+        doc.line(leftMargin, yPos, leftMargin + 80, yPos);
+        yPos += 5;
+        doc.setFont('times', 'normal');
+        doc.setFontSize(10);
+        doc.text('(Signature)', leftMargin, yPos);
+        
+        // PROFESSIONAL FOOTER - PERFECTLY CENTERED
+        const footerY = pageHeight - 20;
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        const footerText1 = 'Generated by LegalAI India Professional Legal Technology Platform';
+        const footerText2 = `Generated on: ${new Date().toLocaleDateString('en-IN')} | Professional Legal Document`;
+        
+        const footer1Width = doc.getTextWidth(footerText1);
+        const footer2Width = doc.getTextWidth(footerText2);
+        
+        doc.text(footerText1, (pageWidth - footer1Width) / 2, footerY);
+        doc.text(footerText2, (pageWidth - footer2Width) / 2, footerY + 5);
+
+        updateProgress(4, 'Professional legal document completed successfully', 100);
+        await delay(500);
+
+        const fileName = `Professional_${collectedData.letterType}_${userName.replace(/\s+/g, '_')}_${letterDate}.pdf`;
+        doc.save(fileName);
+
+        updateProgress(4, `Document generated successfully: ${fileName}`, 100);
+        
+        setTimeout(() => {
+            hideProgress();
+            // Show success notification instead of popup alert
+            showSuccessNotification(
+                'Document Generated Successfully',
+                `Professional ${collectedData.letterType.replace('_', ' ').toUpperCase()} created with comprehensive legal backing and proper formatting.`,
+                fileName
+            );
+        }, 1500);
+
+    } catch (error) {
+        console.error('Error generating document:', error);
+        hideProgress();
+        showSuccessNotification('Generation Error', 'Error generating professional document. Please try again.', 'Error occurred');
+    }
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+
+document.querySelectorAll('.legal-tag').forEach(tag => {
+    tag.addEventListener('click', function() {
+        const userInput = document.getElementById('userInput');
+        userInput.value = `I need professional legal assistance with ${this.textContent.toLowerCase()}`;
+        document.getElementById('chat').scrollIntoView({ behavior: 'smooth' });
+        userInput.focus();
+    });
+});
+</script>
+</body>
+</html>
